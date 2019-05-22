@@ -111,3 +111,81 @@
     - $P(w_i|\mathbf x_g,\mathbf x_b)=\frac{\int p(w_i|\mathbf x)p(\mathbf x)p(\mathbf x_b|\mathbf x_t)d\mathbf x_t}{\int p(\mathbf x)p(\mathbf x_b|\mathbf x_t)d\mathbf x_t}\quad 当p(\mathbf x_b|\mathbf x_t)在整个空间为1时，退化为丢失特征的情况$
 
   - 贝叶斯置信网
+
+- 线性判别函数
+
+- 支持向量机
+
+  - 硬间隔超平面 $H=(\mathbf w,b)=\mathbf w\mathbf x+b$
+
+    - 样本空间是线性可分的 **即** 一定能够找到一个最优超平面可以将不同的样本分开
+
+    - 样本$\mathbf x$到超平面的距离为$\frac{|g(\mathbf x)|}{||\mathbf w||}$
+
+    - 最优超平面：所有能够将样本正确分类的超平面中对新数据的分类错误率最小——*其实代表了它的泛化能力*
+
+    - 对超平面中的权值$\mathbf w$和偏移$b$做任何正的尺度调整不会影响分类结果——为了便于比较不同的超平面（想想为什么尺度变换就可以比较不同的超平面了？）
+
+      - $\mathbf w\leftarrow \frac{\mathbf w}{||\mathbf w||},b\leftarrow \frac{b}{||\mathbf w||}$
+
+    - 分类规则：$\mathbf w\mathbf x+b\ge 1,正样本\quad \mathbf w\mathbf x+b\le-1,负样本$——这是一个约束条件而且需要先进行尺度变换
+
+    - 两个边界超平面的间隔为$\frac{2}{||\mathbf w||}$，我们需要最大化这一间隔
+
+    - 求解最优超平面的问题转化为：
+
+      ​	$\min_{\mathbf w,b}\frac{1}{2}||\mathbf w||^2\qquad s.t.\ y_i(\mathbf w^t\mathbf x_i+b)\ge1,i=1,2,...,m​$
+
+      - 拉格朗日乘子法——转化
+      - SMO算法——求解
+      - KKT条件——支持向量
+
+  - 软间隔超平面
+
+    - 引入松弛变量$\xi_i$处理非线性可分的情况
+
+    - 目标函数-错误率：$\Theta(\xi)=\sum_{i=1}^mI(\xi_i-1)\le\sum_{i=1}^m\xi_i$
+
+      - 原错误率非线性求解困难，运用**定界**的思想转化为线性函数
+
+    - 求解最优超平面的问题转化为：
+
+      ​	$\min_{\mathbf w,b}||\mathbf w||^2+C\sum_{i=1}^m\xi_i\qquad s.t.\ y_i(\mathbf w^t\mathbf x_i+b)\ge1-\xi_i且\xi_i\ge0,i=1,2,...,m​$
+
+      - $\xi_i>1$则分错，$C$为正数，调整允许错分的样本数
+      - 拉格朗日乘子法——转化
+      - SMO算法——求解
+      - KKT条件——支持向量
+
+  - 支持向量机
+
+    - 非线性可分问题通过升维变成线性可分问题
+
+      - 问题：维数灾难和过拟合；计算需求大
+      - SVM的解决：其泛化能力与间隔相关而与维数无关；核函数的引入避免了高维空间的运算
+
+    - 核函数及其隐式映射
+
+      - 隐式映射的概念
+      - 三种常见核函数
+        - 多项式核函数：$K(\mathbf x,\mathbf x')=(\mathbf x^T\mathbf x'+1)^p$
+        - 径向基函数（RBF）：$K(\mathbf x,\mathbf x')=exp(-\frac{1}{2\sigma^2}||\mathbf x-\mathbf x'||^2)$
+        - 两层感知器函数：$K(\mathbf x,\mathbf x')=tanh(\beta_0\mathbf x^T\mathbf x'+\beta_1)$
+
+    - 求解最优超平面的问题转化为：
+
+      ​	$\min_{\mathbf w,b}\frac{1}{2}||\mathbf w||^2\qquad s.t.\ y_i(\mathbf w^t\varphi(\mathbf x_i)+b)\ge1,i=1,2,...,m$
+
+      - 拉格朗日乘子法（最好把《凸优化》上的相关内容看一看）
+      - SMO算法
+      - 核函数
+      - KKT条件
+
+    - SMO算法
+
+      - 二次规划问题
+
+        ​	$\max J(\alpha)=1^T\alpha-\frac{1}{2}\alpha^TH\alpha,其中H_{ij}=y_iy_jK(x_i,x_j),约束条件：\sum_{i=1}^N\alpha_iy_i=0,0\le\alpha_i\le C,i=1,2,...,N$
+
+      - 每次选择两个变量，固定其他变量迭代求解
+
