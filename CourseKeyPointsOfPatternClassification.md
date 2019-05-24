@@ -174,7 +174,7 @@
 
     - 求解最优超平面的问题转化为：
 
-      ​	$\min_{\mathbf w,b}\frac{1}{2}||\mathbf w||^2\qquad s.t.\ y_i(\mathbf w^t\varphi(\mathbf x_i)+b)\ge1,i=1,2,...,m$
+      ​	$\min_{\mathbf w,b}\frac{1}{2}||\mathbf w||^2\qquad s.t.\ y_i(\mathbf w^t\varphi(\mathbf x_i)+b)\ge1,i=1,2,...,m​$
 
       - 拉格朗日乘子法（最好把《凸优化》上的相关内容看一看）
       - SMO算法
@@ -189,3 +189,57 @@
 
       - 每次选择两个变量，固定其他变量迭代求解
 
+- 多层神经网络
+  - 引言
+    - 线性判别函数处理非线性可分问题时，最主要的困难是选择合适的非线性$\varphi$函数
+    - 神经网络是一种可以适应复杂模型的非常灵活的启发式的统计模式识别技术
+    - 启发式的技巧
+    - 网络的拓扑结构：对问题启发式的知识可以通过对隐含层的数目、节点单元个数、和反馈节点数目等的选择，而轻而易举地嵌入到网络结构中。
+    - 正则化：选择或调整网络地复杂程度（置信风险+经验风险=结构风险）
+  - 前馈运算与分类
+    - $g_k(\mathbf x)\equiv z_k=f(\sum_{j=1}^{n_H}w_{kj}f(\sum_{i=1}^dw_{ji}x_i+w_{j0})+w_{k0})=f(\sum_{j=1}^{n_H}w_{kj}f(\sum_{i=0}^dw_{ji}x_i)+w_{k0})\quad x_0=1$
+    - 只要给出足够数量的隐单元、适当的非线性函数和权值，任何从输入到输出的连续映射函数都可以用一个三层非线性网络实现（任何后验概率都可以用一个三层网络表示）
+  - 反向传播算法（backpropagation）
+    - $x_i\rightarrow y_j\rightarrow z_k\leftrightarrow t_k$ 
+    - 目标函数：$J(\mathbf w)=\frac{1}{2}||\mathbf t-\mathbf z||^2$
+    - $\Delta\mathbf w=-\eta\frac{\partial J}{\part\mathbf w}\quad \mathbf w(m+1)=\mathbf w(m)+\Delta\mathbf w$
+    - 链式求导法则：
+      - $\Delta w_{kj}=\eta\delta_ky_j\quad \delta_k=(t_k-z_k)f'(net_k)$
+      - $\Delta w_{ji}=\eta\delta_jx_i\quad \delta_j=f'(net_j)\sum_{k=1}^cw_{kj}\delta_k$
+      - 试着用矩阵来求导和表示。
+      - 试着用更形象的方式去记忆和理解：若$y_j$和$(t_k-z_k)$都是正的且$f'(net_k)$一般也是正的，那么应该增大权值
+    - 训练协议：随即训练(stochastic)、成批训练(batch)、在线训练(on-line)
+      - epoch：一个epoch对应于训练集的所有样本都提供给输入层一次
+    - 学习曲线：误差（目标函数）对训练总量（回合数）的函数
+      - 训练集，测试集，验证集（交叉验证技术）
+  - 误差曲面
+    - 多重极小：不希望陷入有**较高的训练误差**的局部极小值
+      - 较大型的网络：权值过剩可以帮助避免陷入局部极小值但同时带来过拟合的风险
+      - 迭代梯度下降：初始化权值再训练一遍
+      - 简单的启发式信息可以解决这个问题
+  - 与贝叶斯理论的联系
+    - $J_k(\mathbf w)=\sum_{\mathbf x}[g_k(\mathbf x;\mathbf w)-t_k]^2=\sum_{\mathbf x\in w_k}[g_k(\mathbf x;\mathbf w)-1]^2+\sum_{\mathbf x\notin w_k}[g_k(\mathbf x;\mathbf w)-0]^2=n\left\{\frac{n_k}{n}\frac{1}{n_k}\sum_{\mathbf x\in w_K}[g_k(\mathbf x;\mathbf w)-1]^2+\frac{n-n_k}{n}\frac{1}{n-n_k}\sum_{\mathbf x\notin w_k}[g_k(\mathbf x;\mathbf w)-0]^2\right\}$
+    - $\tilde J(\mathbf w)\equiv\lim_{n\rightarrow \infty}\frac{1}{n}J_k(\mathbf w)=\int[g_k(\mathbf x;\mathbf w)-P(w_k|\mathbf x)]^2p(\mathbf x)d\mathbf x+\int P(w_k|\mathbf x)P(w_{i\neq k}|\mathbf x)p(\mathbf x)d\mathbf x$
+      - 上式右边第二项与$\mathbf w$无关
+      - 训练足够好的网络的输出将为：$g_k(\mathbf x;\mathbf w)\approx P(w_k|\mathbf x)$
+      - 当样本数量趋近于无穷极限时，已训练过的网络的输出将可以近似成一个最小二乘意义上的后验概率（假设 这个网络可以表示后验概率函数）
+    - 输出为概率：$z_k=\frac{e^{net_k}}{\sum_{m=1}^ce^{net_m}}$(softmax函数)
+  - 正则化
+  - 改进反向传播的一些实用技术
+    - 激活函数
+      - 
+    - sigmoid函数的参数
+    - 输入信号尺度变换
+    - 目标值
+    - 带噪声的训练法
+    - 人工“制造”数据
+    - 隐单元数
+    - 权值初始化
+    - 学习率
+    - 冲量项
+    - 权值衰减
+    - 线索
+    - 在线训练、随机训练或成批训练
+    - 停止训练
+    - 隐含层数
+    - 误差准则函数
